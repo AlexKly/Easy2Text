@@ -1,2 +1,2 @@
-# easy-to-text
+# Easy2Text
 The multilingual Speech-to-Text translator and grammar self-corrector based on ML approaches and released on the Aiogram framework (Telegram Bot)
