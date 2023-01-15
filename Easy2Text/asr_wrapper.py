@@ -1,4 +1,4 @@
-import os, logging, whisper
+import os, torch, logging, librosa, whisper
 from Easy2Text import Configurations, Downloader
 
 
@@ -16,11 +16,17 @@ class ASRWrapper:
             if self.verbose: logging.info(f'Start downloading model to {Configurations.dir_models} -->')
             self.asr_model = Downloader().download_asr(modelname=modelname, device=self.device)
 
+    def load_samples(self, audioname):
+        samples, _ = librosa.load(path=audioname, sr=16000)
+        samples = whisper.pad_or_trim(array=samples)
+        samples = whisper.pad_or_trim(array=samples)
+        return torch.tensor(data=samples, device=self.device)
+
     def detect_lang(self, samples):
-        mel = whisper.log_mel_spectrogram(samples).to(self.device)
+        mel = whisper.log_mel_spectrogram(audio=samples).to(self.device)
         _, probs = self.asr_model.detect_language(mel)
-        if self.verbose: logging.info(f'Detected language --> {probs[0]}')
-        return probs[0]
+        if self.verbose: logging.info(f'Detected language --> {list(probs)[0]}')
+        return list(probs)[0]
 
     def get_transcription(self, samples, lang):
         if self.verbose: logging.info(f'Start transcription -->')
